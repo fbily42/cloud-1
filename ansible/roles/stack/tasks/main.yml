@@ -1,0 +1,32 @@
+- name: Create target directory
+  file:
+    path: /srv/cloud1
+    state: directory
+    owner: ubuntu
+    mode: '0755'
+
+- name: Copy all Inception project files
+  copy:
+    src: .
+    dest: /srv/cloud1/
+    owner: ubuntu
+    mode: '0644'
+
+- name: Ensure database data directory exists
+  file:
+    path: /srv/cloud1/data/database
+    state: directory
+    owner: ubuntu
+    mode: '0755'
+
+- name: Ensure wordpress data directory exists
+  file:
+    path: /srv/cloud1/data/wordpress
+    state: directory
+    owner: ubuntu
+    mode: '0755'
+
+- name: Launch Docker Compose stack
+  command: docker compose up -d
+  args:
+    chdir: /srv/cloud1

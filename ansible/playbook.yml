@@ -1,0 +1,14 @@
+- name: Wait for SSH to be ready
+  hosts: cloud1
+  gather_facts: false
+  tasks:
+    - name: Wait for SSH connection
+      wait_for_connection:
+        timeout: 120
+
+- name: Cloud-1 deployment.
+  hosts: cloud1
+  become: true
+  roles:
+    - docker
+    - stack
