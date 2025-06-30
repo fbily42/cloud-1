@@ -8,6 +8,5 @@
 
 # Credentials / secrets
 *.csv
-.aws_env.sh
-delete_venv.sh
-setup_venv.sh
+scripts/.env
+/.env

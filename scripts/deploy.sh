@@ -2,6 +2,15 @@
 
 set -e
 
+ENV_FILE=".env"
+
+if [ ! -f "$ENV_FILE" ]; then
+  echo "❌ ERREUR : fichier $ENV_FILE introuvable."
+  exit 1
+fi
+
+export $(grep -v '^#' "$ENV_FILE" | xargs)
+
 echo "🔧 Initializing Terraform..."
 cd terraform
 terraform init
@@ -11,6 +20,10 @@ terraform apply -auto-approve
 
 echo "🌐 Retrieving public IP address..."
 INSTANCE_IP=$(terraform output -raw instance_public_ip)
+
+echo "🔁 DuckDNS update"
+curl -s "https://www.duckdns.org/update?domains=$DUCKDNS_DOMAIN&token=$DUCKDNS_TOKEN&ip=$INSTANCE_IP&verbose=true"
+echo "✅ DuckDNS updated: https://$DUCKDNS_DOMAIN.duckdns.org -> $INSTANCE_IP"
 
 cd ../ansible
 

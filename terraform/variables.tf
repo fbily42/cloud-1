@@ -9,7 +9,7 @@ variable "key_name" {
 
 variable "public_key_path" {
   description = "Chemin absolu vers la clé publique locale"
-  default     = "/home/fbily/.ssh/id_rsa.pub"
+  type = string
 }
 
 variable "instance_type" {

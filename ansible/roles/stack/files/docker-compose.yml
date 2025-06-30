@@ -35,6 +35,18 @@ services:
      - inception
     env_file: .env
 
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: mariadb
+      MYSQL_ROOT_PASSWORD: ${BDD_ROOT_PASSWORD}
+    depends_on:
+      - mariadb
+    networks:
+      - inception
+
 # NETWORK
 networks:
   inception:
