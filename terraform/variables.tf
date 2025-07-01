@@ -12,6 +12,10 @@ variable "public_key_path" {
   type = string
 }
 
+variable "instance_count" {
+	type = number
+}
+
 variable "instance_type" {
   default = "t2.micro"
 }

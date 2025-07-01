@@ -6,9 +6,11 @@
 
 ## Project Overview
 
-The project provisions an EC2 instance on **AWS**, running a full **WordPress** stack, a **MariaDB** database, and a **phpMyAdmin** interface. Each component runs in its own isolated container following the *1 process = 1 container* principle. The infrastructure is fully automated with **Terraform**, configured with **Ansible**, and orchestrated using **Docker Compose**.
+The project provisions **multiple EC2 instances** on **AWS**, each running a full **WordPress** stack, a **MariaDB** database, and a **phpMyAdmin** interface. Each component runs in its own isolated container following the *1 process = 1 container* principle. The infrastructure is fully automated with **Terraform**, configured with **Ansible**, and orchestrated using **Docker Compose**.
 
-Public access is strictly controlled with AWS **Security Groups**, ensuring that the database is never directly exposed to the Internet. Traffic is secured with **HTTPS** using Nginx as a reverse proxy, routing requests to the correct service depending on the requested URL. **DuckDNS** is integrated to maintain a dynamic domain pointing to the instance’s public IP.
+Public access is strictly controlled with AWS **Security Groups**, ensuring that the database is never directly exposed to the Internet. Traffic is secured with **HTTPS** using Nginx as a reverse proxy, routing requests to the correct service depending on the requested URL. **DuckDNS** is integrated to maintain a dynamic domain pointing to the public IP of one instance.
+
+This architecture demonstrates that the entire deployment is **replicable in parallel**, with multiple servers running the same stack to illustrate a scalable Infrastructure-as-Code workflow.
 
 ---
 
@@ -61,14 +63,17 @@ AWS_DEFAULT_REGION=YourAWSRegion
 
 DUCKDNS_TOKEN=YourDuckDNSToken
 DUCKDNS_DOMAIN=your-subdomain
+
+SSH_PATH=YourPublicSSHKeyPath
 ```
 
 **3. Configure your `terraform.tfvars`**
 
-Edit the terraform/terraform.tfvars file to set the absolute or relative path to your public SSH key:
+Edit the terraform/terraform.tfvars file to set the absolute or relative path to your public SSH key, and adjust the count variable to define how many EC2 instances you want to deploy in parallel:
 
 ```env
 public_key_path = "/home/your_user/.ssh/id_rsa.pub"
+instance_count = 2
 ```
 This key will be used to connect to your AWS EC2 instance via SSH.
 
@@ -95,7 +100,7 @@ source ~/.cloud1/bin/activate
 
 This script:
 
-- Runs terraform init and apply to create the AWS EC2 instance and networking
+- Runs `terraform init` and `apply` to create the AWS EC2 instance and networking
 
 - Updates your DuckDNS domain with the new public IP
 
@@ -112,7 +117,7 @@ This script:
 
 - phpMyAdmin: ```https://<your-duckdns>.duckdns.org/pma```
 
-All connections are secured through HTTPS handled by Nginx. The MariaDB database is only accessible internally.
+The DuckDNS record will point to the public IP of the first deployed instance. All connections are secured through HTTPS handled by Nginx. The MariaDB databases are only accessible internally within each server.
 
 ### Cleaning Up
 
@@ -144,7 +149,12 @@ deactivate
 
 ## Conclusion
 
-This project demonstrates a full Infrastructure-as-Code deployment workflow using **AWS**, **Terraform**, **Ansible**, and **Docker**, orchestrated to run a secure, multi-service WordPress stack.  
-By following these steps, you can deploy, manage, and tear down your infrastructure reliably, with data persistence and HTTPS security handled by **Nginx**.
+This project demonstrates a full Infrastructure-as-Code deployment workflow using **AWS**, **Terraform**, **Ansible**, and **Docker**, orchestrated to run a secure, multi-service WordPress stack on **multiple servers in parallel**.
+
+Each server is provisioned independently with its own local **MariaDB** database for demonstration purposes.  
+In a real-world production environment, you would typically use a **shared, managed database** (e.g., **AWS RDS**) to ensure that data such as posts, comments, and user accounts are consistent across all servers.  
+This would be combined with a **load balancer** and shared storage for uploaded media to provide true horizontal scalability.
+
+By following these steps, you can deploy, manage, and tear down your infrastructure reliably, with data persistence and HTTPS security handled by **Nginx** and your domain dynamically managed by **DuckDNS**.
 
 > **Cloud-1** was developed as part of the [42 Paris](https://42.fr) curriculum. 

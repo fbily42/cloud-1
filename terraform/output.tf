@@ -1,9 +1,9 @@
-output "instance_id" {
-  description = "ID of the EC2 instance"
-  value       = aws_instance.cloud1.id
+output "instance_ids" {
+  description = "IDs of the EC2 instances"
+  value       = [for instance in aws_instance.cloud1 : instance.id]
 }
 
-output "instance_public_ip" {
-  description = "Public IP address of the EC2 instance"
-  value       = aws_instance.cloud1.public_ip
+output "instance_public_ips" {
+  description = "Public IP addresses of the EC2 instances"
+  value       = [for instance in aws_instance.cloud1 : instance.public_ip]
 }

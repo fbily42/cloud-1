@@ -14,6 +14,7 @@ provider "aws" {
 }
 
 resource "aws_instance" "cloud1" {
+  count						  = var.instance_count
   ami                         = var.ami_id
   instance_type               = var.instance_type
   key_name                    = aws_key_pair.deployer.key_name
